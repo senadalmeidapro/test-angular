@@ -1,0 +1,60 @@
+<mat-toolbar class="app-toolbar">
+  <a class="brand" routerLink="/dashboard" aria-label="Angular Lab — accueil">
+    <span class="brand__mark"><mat-icon>terminal</mat-icon></span>
+    <span>
+      <strong>Angular Lab</strong>
+      <small>Project Dashboard</small>
+    </span>
+  </a>
+
+  <nav class="app-nav" aria-label="Navigation principale">
+    <a
+      matButton
+      routerLink="/dashboard"
+      routerLinkActive="app-nav__active"
+      [routerLinkActiveOptions]="{ exact: true }"
+    >
+      <mat-icon>space_dashboard</mat-icon>
+      Dashboard
+    </a>
+  </nav>
+
+  <span class="app-toolbar__spacer"></span>
+
+  <button
+    matIconButton
+    type="button"
+    [matTooltip]="preferences.isCompact() ? 'Affichage confortable' : 'Affichage compact'"
+    [attr.aria-label]="
+      preferences.isCompact() ? 'Passer en affichage confortable' : 'Passer en affichage compact'
+    "
+    (click)="preferences.toggleDensity()"
+  >
+    <mat-icon>{{ preferences.isCompact() ? 'density_medium' : 'density_small' }}</mat-icon>
+  </button>
+
+  <button
+    matIconButton
+    type="button"
+    aria-label="Ouvrir le menu"
+    [matMenuTriggerFor]="applicationMenu"
+  >
+    <mat-icon>more_vert</mat-icon>
+  </button>
+  <mat-menu #applicationMenu="matMenu">
+    <a mat-menu-item routerLink="/dashboard">
+      <mat-icon>dashboard</mat-icon>
+      Dashboard
+    </a>
+    <a mat-menu-item routerLink="/projects/project-portal">
+      <mat-icon>folder_open</mat-icon>
+      Projet de démonstration
+    </a>
+  </mat-menu>
+</mat-toolbar>
+
+<main class="app-content" [class.app-content--compact]="preferences.isCompact()">
+  <router-outlet />
+</main>
+
+<footer class="app-footer">Angular 22 · Signals · OnPush · Reactive Forms · zoneless</footer>

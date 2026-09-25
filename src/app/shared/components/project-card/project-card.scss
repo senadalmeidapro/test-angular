@@ -1,0 +1,36 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.project-card {
+  box-sizing: border-box;
+  height: 100%;
+  border: 1px solid var(--lab-border);
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.project-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 32px rgb(23 31 49 / 12%);
+}
+
+.project-card[data-status='completed'] {
+  background: var(--mat-sys-surface-container-low);
+}
+
+.project-card__description {
+  min-height: 3.5rem;
+  margin: 1rem 0;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.project-card__date {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 0.9rem;
+}

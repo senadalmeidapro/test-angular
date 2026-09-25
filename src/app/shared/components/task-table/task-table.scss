@@ -1,0 +1,77 @@
+:host {
+  display: block;
+}
+
+.task-table-card {
+  overflow: hidden;
+  border: 1px solid var(--lab-border);
+}
+
+.task-table-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-right: 0.75rem;
+}
+
+.task-table-card__content {
+  overflow-x: auto;
+  padding: 0;
+}
+
+table {
+  width: 100%;
+  min-width: 860px;
+}
+
+th,
+td {
+  vertical-align: top;
+}
+
+.task-cell {
+  display: grid;
+  min-width: 260px;
+  gap: 0.4rem;
+}
+
+.task-cell > span {
+  max-width: 38rem;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.task-cell__checklist {
+  display: grid;
+  width: 190px;
+  gap: 0.25rem;
+}
+
+.task-cell__checklist small {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.status-cell {
+  display: grid;
+  min-width: 140px;
+  gap: 0.5rem;
+  justify-items: start;
+}
+
+.priority-chip {
+  text-transform: capitalize;
+}
+
+.priority-chip--high {
+  --mat-chip-elevated-container-color: var(--mat-sys-error-container);
+  --mat-chip-label-text-color: var(--mat-sys-on-error-container);
+}
+
+.priority-chip--medium {
+  --mat-chip-elevated-container-color: var(--mat-sys-tertiary-container);
+  --mat-chip-label-text-color: var(--mat-sys-on-tertiary-container);
+}
+
+.task-row--done .task-cell > strong {
+  color: var(--mat-sys-on-surface-variant);
+  text-decoration: line-through;
+}

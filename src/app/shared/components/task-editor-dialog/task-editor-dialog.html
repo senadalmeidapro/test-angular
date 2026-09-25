@@ -1,0 +1,178 @@
+<h2 mat-dialog-title>{{ isEditing ? 'Modifier la tâche' : 'Créer une tâche' }}</h2>
+
+<form [formGroup]="taskForm" (ngSubmit)="submit()">
+  <mat-dialog-content class="task-editor">
+    <section class="form-state" aria-live="polite">
+      <mat-chip-set>
+        <mat-chip [class.form-state__invalid]="formStatus() === 'INVALID'">
+          {{ formStatus() }}
+        </mat-chip>
+        <mat-chip>{{ taskForm.dirty ? 'dirty' : 'pristine' }}</mat-chip>
+        <mat-chip>{{ taskForm.touched ? 'touched' : 'untouched' }}</mat-chip>
+      </mat-chip-set>
+      <small>
+        Dernière valeur : {{ lastValueChange() ?? 'aucine' }} · statut :
+        {{ lastStatusChange() }}
+      </small>
+    </section>
+
+    <div class="form-grid">
+      <mat-form-field appearance="outline" class="form-grid__wide">
+        <mat-label>Titre</mat-label>
+        <input matInput formControlName="title" autocomplete="off" />
+        @if (taskForm.controls.title.hasError('required')) {
+          <mat-error
+            >Le titre est obligatoire et ne peut pas être composé uniquement d’espaces.</mat-error
+          >
+        } @else if (taskForm.controls.title.hasError('minlength')) {
+          <mat-error>Utilisez au moins 3 caractères.</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form-grid__wide">
+        <mat-label>Description</mat-label>
+        <textarea matInput rows="3" formControlName="description"></textarea>
+        <mat-hint align="end">{{ taskForm.controls.description.value.length }} / 500</mat-hint>
+        @if (taskForm.controls.description.hasError('maxlength')) {
+          <mat-error>La description ne peut pas dépasser 500 caractères.</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Statut</mat-label>
+        <mat-select formControlName="status">
+          @for (option of statusOptions; track option.value) {
+            <mat-option [value]="option.value">{{ option.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Priorité</mat-label>
+        <mat-select formControlName="priority">
+          @for (option of priorityOptions; track option.value) {
+            <mat-option [value]="option.value">{{ option.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Responsable</mat-label>
+        <mat-select formControlName="assigneeId">
+          @for (user of users; track user.id) {
+            <mat-option [value]="user.id">{{ user.name }} — {{ user.role }}</mat-option>
+          }
+        </mat-select>
+        @if (taskForm.controls.assigneeId.hasError('required')) {
+          <mat-error>Sélectionnez un responsable.</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Échéance</mat-label>
+        <input matInput type="date" formControlName="dueDate" />
+        @if (taskForm.controls.dueDate.hasError('required')) {
+          <mat-error>La date d’échéance est obligatoire.</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <section class="form-section">
+      <div class="form-section__heading">
+        <div>
+          <h3>Étiquettes</h3>
+          <p>FormArray dynamique, utile pour des tags métier.</p>
+        </div>
+        <button matButton="tonal" type="button" (click)="addTag()">
+          <mat-icon>add</mat-icon>
+          Ajouter
+        </button>
+      </div>
+
+      <div class="tag-list" formArrayName="tags">
+        @for (tagControl of tagControls.controls; track tagControl; let index = $index) {
+          <div class="tag-list__item">
+            <mat-form-field appearance="outline">
+              <mat-label>Tag {{ index + 1 }}</mat-label>
+              <input matInput [formControlName]="index" />
+            </mat-form-field>
+            <button
+              matIconButton
+              type="button"
+              aria-label="Supprimer le tag"
+              (click)="removeTag(index)"
+            >
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+        } @empty {
+          <p class="muted">Aucune étiquette.</p>
+        }
+      </div>
+    </section>
+
+    <mat-divider />
+
+    <section class="form-section">
+      <div class="form-section__heading">
+        <div>
+          <h3>Checklist</h3>
+          <p>Au moins une étape est requise pour valider le formulaire.</p>
+        </div>
+        <button matButton="tonal" type="button" (click)="addChecklistItem()">
+          <mat-icon>add</mat-icon>
+          Ajouter une étape
+        </button>
+      </div>
+
+      <div class="checklist" formArrayName="checklist">
+        @for (checklistItem of checklistItems.controls; track checklistItem; let index = $index) {
+          <div class="checklist__item" [formGroupName]="index">
+            <mat-checkbox formControlName="done">Étape terminée</mat-checkbox>
+            <mat-form-field appearance="outline">
+              <mat-label>Libellé de l’étape</mat-label>
+              <input matInput formControlName="label" />
+              @if (checklistItem.controls.label.invalid && checklistItem.controls.label.touched) {
+                <mat-error>Saisissez un libellé d’au moins 2 caractères.</mat-error>
+              }
+            </mat-form-field>
+            <button
+              matIconButton
+              type="button"
+              aria-label="Supprimer l’étape"
+              (click)="removeChecklistItem(index)"
+            >
+              <mat-icon>delete_outline</mat-icon>
+            </button>
+          </div>
+        } @empty {
+          <p class="form-error">Ajoutez au moins une étape à la checklist.</p>
+        }
+      </div>
+    </section>
+
+    @if (priority() === 'high') {
+      <mat-divider />
+      <section class="form-section risk-section">
+        <h3>Risque élevé</h3>
+        <p>Décrivez le plan de réduction du risque.</p>
+        <mat-form-field appearance="outline">
+          <mat-label>Mesure de mitigation</mat-label>
+          <textarea matInput rows="2" formControlName="riskMitigation"></textarea>
+        </mat-form-field>
+        @if (
+          taskForm.hasError('riskMitigationRequired') && taskForm.controls.riskMitigation.touched
+        ) {
+          <p class="form-error">La mitigation est obligatoire pour une priorité haute.</p>
+        }
+      </section>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button matButton type="button" (click)="cancel()">Annuler</button>
+    <button matButton="filled" type="submit" [disabled]="taskForm.invalid">
+      {{ isEditing ? 'Enregistrer' : 'Créer la tâche' }}
+    </button>
+  </mat-dialog-actions>
+</form>

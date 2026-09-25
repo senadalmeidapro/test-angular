@@ -1,0 +1,113 @@
+<section class="page-shell project-page">
+  @if (workspaceState() === 'idle') {
+    <mat-card class="state-card">
+      <mat-spinner diameter="42" />
+      <h1>Préparation de l’espace projet…</h1>
+    </mat-card>
+  } @else if (workspaceState() === 'loading') {
+    <mat-card class="state-card">
+      <mat-progress-bar mode="indeterminate" />
+      <mat-spinner diameter="42" />
+      <h1>Chargement du projet et des tâches</h1>
+      <p>La page attend les réponses de l’API REST.</p>
+    </mat-card>
+  } @else if (workspaceState() === 'error') {
+    <mat-card class="state-card state-card--error">
+      <mat-icon>cloud_off</mat-icon>
+      <h1>Impossible de charger cet espace</h1>
+      <p>{{ workspaceError() }}</p>
+      <div class="state-card__actions">
+        <button matButton="filled" type="button" (click)="refresh()">
+          <mat-icon>refresh</mat-icon>
+          Réessayer
+        </button>
+        <button matButton type="button" (click)="backToDashboard()">Retour au dashboard</button>
+      </div>
+    </mat-card>
+  } @else if (workspaceState() === 'not-found') {
+    <mat-card class="state-card">
+      <mat-icon>folder_off</mat-icon>
+      <h1>Projet introuvable</h1>
+      <p>L’identifiant « {{ projectId() }} » ne correspond à aucun projet chargé.</p>
+      <button matButton="filled" type="button" (click)="backToDashboard()">Voir les projets</button>
+    </mat-card>
+  } @else {
+    @if (projectStore.selectedProject(); as project) {
+      <header class="page-header project-header">
+        <div>
+          <button matButton type="button" (click)="backToDashboard()">
+            <mat-icon>arrow_back</mat-icon>
+            Projets
+          </button>
+          <p class="eyebrow">Espace de travail</p>
+          <h1>{{ project.name }}</h1>
+          <p>{{ project.description }}</p>
+        </div>
+        <div class="project-header__meta">
+          <mat-chip-set>
+            <mat-chip>Échéance : {{ project.dueDate | date: 'dateMedium' : '' : 'fr' }}</mat-chip>
+            <mat-chip highlighted>{{ progressPercent() }} % terminé</mat-chip>
+          </mat-chip-set>
+          <button
+            matButton="filled"
+            type="button"
+            [disabled]="taskStore.isMutating()"
+            (click)="openCreateDialog()"
+          >
+            <mat-icon>add</mat-icon>
+            Nouvelle tâche
+          </button>
+        </div>
+      </header>
+
+      <div class="task-kpis" aria-label="Statistiques des tâches">
+        <mat-card
+          ><strong>{{ taskStore.tasks().length }}</strong
+          ><span>Total</span></mat-card
+        >
+        <mat-card
+          ><strong>{{ inProgressTaskCount() }}</strong
+          ><span>En cours</span></mat-card
+        >
+        <mat-card
+          ><strong>{{ completedTaskCount() }}</strong
+          ><span>Terminées</span></mat-card
+        >
+      </div>
+
+      <app-task-filter-bar
+        [(searchTerm)]="searchTerm"
+        [(statusFilter)]="statusFilter"
+        [resultCount]="filteredTasks().length"
+        (filtersCleared)="filtersCleared()"
+      />
+
+      @if (taskStore.loadState() === 'empty') {
+        <mat-card class="empty-state">
+          <mat-icon>task_alt</mat-icon>
+          <h2>Aucune tâche dans ce projet</h2>
+          <p>Créez la première étape pour lancer le suivi.</p>
+          <button matButton="filled" type="button" (click)="openCreateDialog()">
+            Créer une tâche
+          </button>
+        </mat-card>
+      } @else if (taskStore.loadState() === 'success' && filteredTasks().length === 0) {
+        <mat-card class="empty-state">
+          <mat-icon>search_off</mat-icon>
+          <h2>Aucun résultat</h2>
+          <p>Modifiez la recherche ou le statut pour retrouver des tâches.</p>
+        </mat-card>
+      } @else {
+        <app-task-table
+          [tasks]="filteredTasks()"
+          [users]="userStore.users()"
+          [pendingTaskIds]="taskStore.pendingTaskIds()"
+          (refreshRequested)="refresh()"
+          (taskStatusChanged)="changeTaskStatus($event)"
+          (taskEditRequested)="openEditDialog($event)"
+          (taskDeleteRequested)="confirmDelete($event)"
+        />
+      }
+    }
+  }
+</section>

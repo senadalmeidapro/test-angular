@@ -1,0 +1,33 @@
+<mat-card class="lab">
+  <mat-card-header>
+    <mat-card-title>Laboratoire Change Detection</mat-card-title>
+    <mat-card-subtitle>
+      Le parent a rendu {{ parentRenderCount() }} fois · révision {{ recordRevision() }}
+    </mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    <p>
+      Mutez l’objet sur place : Eager est revisité, OnPush reçoit la même référence et reste en
+      retard. Remplacez la référence : les deux inputs sont invalidés.
+    </p>
+    <div class="lab__actions">
+      <button matButton="tonal" type="button" (click)="mutateInPlace()">
+        <mat-icon>edit</mat-icon>
+        Mutation sur place
+      </button>
+      <button matButton="filled" type="button" (click)="replaceReference()">
+        <mat-icon>swap_horiz</mat-icon>
+        Nouvelle référence
+      </button>
+    </div>
+    <div class="lab__probes">
+      <app-eager-probe [record]="record()" />
+      <app-onpush-probe [record]="record()" />
+    </div>
+    <p class="lab__hint">
+      Cliquez ensuite « + Champ local » dans OnPush : l’événement marque la vue dirty et révèle
+      l’objet déjà muté. Un signal lu dans le template suit le même principe avec une notification
+      plus directe.
+    </p>
+  </mat-card-content>
+</mat-card>

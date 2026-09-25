@@ -1,0 +1,128 @@
+@use '@angular/material' as mat;
+
+html {
+  color-scheme: light;
+
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$azure-palette,
+        tertiary: mat.$violet-palette,
+      ),
+      typography: Roboto,
+      density: 0,
+    )
+  );
+
+  --lab-border: color-mix(in srgb, var(--mat-sys-outline) 24%, transparent);
+  --lab-page-max-width: 1440px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  background:
+    radial-gradient(
+      circle at 12% 0%,
+      color-mix(in srgb, var(--mat-sys-primary) 8%, transparent),
+      transparent 30rem
+    ),
+    var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font-family:
+    Roboto,
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+.mat-icon {
+  font-family: 'Material Icons Round';
+  font-feature-settings: 'liga';
+}
+
+.page-shell {
+  width: min(100%, var(--lab-page-max-width));
+  margin-inline: auto;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.page-header h1,
+.page-header p {
+  margin-top: 0;
+}
+
+.page-header h1 {
+  margin-bottom: 0.5rem;
+  font-size: clamp(2rem, 5vw, 3.75rem);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+}
+
+.eyebrow {
+  margin-bottom: 0.4rem;
+  color: var(--mat-sys-primary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+code {
+  padding: 0.1rem 0.35rem;
+  border-radius: 0.3rem;
+  background: var(--mat-sys-surface-container-high);
+  color: var(--mat-sys-primary);
+  font-family: 'Cascadia Code', 'SFMono-Regular', Consolas, monospace;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.lab-snackbar {
+  --mat-snack-bar-container-color: var(--mat-sys-inverse-surface);
+  --mat-snack-bar-supporting-text-color: var(--mat-sys-inverse-on-surface);
+}
+
+.lab-snackbar--error {
+  --mat-snack-bar-container-color: var(--mat-sys-error);
+  --mat-snack-bar-supporting-text-color: var(--mat-sys-on-error);
+}
+
+@media (max-width: 720px) {
+  .page-header {
+    flex-direction: column;
+  }
+}

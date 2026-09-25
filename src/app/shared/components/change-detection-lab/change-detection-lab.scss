@@ -1,0 +1,46 @@
+:host {
+  display: block;
+}
+
+.lab {
+  border: 1px solid var(--lab-border);
+  background: linear-gradient(145deg, var(--mat-sys-surface-container-low), var(--mat-sys-surface));
+}
+
+.lab__actions,
+.lab__probes {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.lab__actions {
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+}
+
+.lab__probes {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.lab__hint {
+  margin-bottom: 0;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+code {
+  display: block;
+  min-height: 3rem;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  background: var(--mat-sys-surface-container-highest);
+}
+
+p {
+  margin: 0.5rem 0;
+}
+
+@media (max-width: 700px) {
+  .lab__probes {
+    grid-template-columns: 1fr;
+  }
+}

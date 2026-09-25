@@ -1,0 +1,83 @@
+:host {
+  display: flex;
+  min-height: 100dvh;
+  flex-direction: column;
+}
+
+.app-toolbar {
+  position: sticky;
+  z-index: 10;
+  top: 0;
+  border-bottom: 1px solid var(--lab-border);
+  background: var(--mat-sys-surface);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: inherit;
+  text-decoration: none;
+}
+
+.brand__mark {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  place-items: center;
+  border-radius: 0.75rem;
+  background: var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
+}
+
+.brand span:last-child {
+  display: grid;
+  line-height: 1.1;
+}
+
+.brand small {
+  margin-top: 0.2rem;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.app-nav {
+  margin-left: 2rem;
+}
+
+.app-nav__active {
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+}
+
+.app-toolbar__spacer {
+  flex: 1;
+}
+
+.app-content {
+  flex: 1;
+  padding: clamp(1rem, 3vw, 2.5rem);
+  transition: padding 180ms ease;
+}
+
+.app-content--compact {
+  padding: 1rem;
+}
+
+.app-footer {
+  padding: 1rem;
+  border-top: 1px solid var(--lab-border);
+  color: var(--mat-sys-on-surface-variant);
+  text-align: center;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 600px) {
+  .brand small,
+  .app-nav a mat-icon {
+    display: none;
+  }
+
+  .app-nav {
+    margin-left: 0.5rem;
+  }
+}

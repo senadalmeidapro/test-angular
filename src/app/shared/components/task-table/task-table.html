@@ -1,0 +1,128 @@
+<mat-card class="task-table-card">
+  <mat-card-header class="task-table-card__header">
+    <mat-card-title>Tâches du projet</mat-card-title>
+    <button
+      matIconButton
+      type="button"
+      aria-label="Recharger les tâches"
+      matTooltip="Recharger"
+      (click)="refresh()"
+    >
+      <mat-icon>refresh</mat-icon>
+    </button>
+  </mat-card-header>
+
+  <mat-card-content class="task-table-card__content">
+    <table mat-table [dataSource]="taskRows()">
+      <ng-container matColumnDef="done">
+        <th mat-header-cell *matHeaderCellDef aria-label="Terminer"></th>
+        <td mat-cell *matCellDef="let task">
+          <mat-checkbox
+            [checked]="task.status === 'done'"
+            [disabled]="isPending(task.id)"
+            [aria-label]="'Marquer ' + task.title + ' comme terminée'"
+            (change)="toggleDone(task, $event.checked)"
+          />
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="task">
+        <th mat-header-cell *matHeaderCellDef>Tâche</th>
+        <td mat-cell *matCellDef="let task">
+          <div class="task-cell">
+            <strong>{{ task.title }}</strong>
+            <span>{{ task.description }}</span>
+            @if (task.tags.length > 0) {
+              <mat-chip-set aria-label="Étiquettes">
+                @for (tag of task.tags; track $index) {
+                  <mat-chip>{{ tag }}</mat-chip>
+                }
+              </mat-chip-set>
+            }
+            @if (task.checklist.length > 0) {
+              <div class="task-cell__checklist">
+                <mat-progress-bar mode="determinate" [value]="checklistProgress(task)" />
+                <small>{{ checklistProgress(task) }} % de la checklist</small>
+              </div>
+            }
+          </div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="assignee">
+        <th mat-header-cell *matHeaderCellDef>Responsable</th>
+        <td mat-cell *matCellDef="let task">{{ assigneeName(task) }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Statut / priorité</th>
+        <td mat-cell *matCellDef="let task">
+          <div class="status-cell">
+            <mat-select
+              [value]="task.status"
+              [disabled]="isPending(task.id)"
+              [aria-label]="'Statut de ' + task.title"
+              (selectionChange)="changeStatus(task, $event.value)"
+            >
+              <mat-option value="todo">À faire</mat-option>
+              <mat-option value="in-progress">En cours</mat-option>
+              <mat-option value="done">Terminé</mat-option>
+            </mat-select>
+            <mat-chip [class]="'priority-chip priority-chip--' + task.priority">
+              {{ task.priority }}
+            </mat-chip>
+            @if (task.priority === 'high') {
+              <mat-icon
+                class="risk-icon"
+                matTooltip="Mitigation : {{ task.riskMitigation }}"
+                aria-label="Plan de mitigation du risque"
+              >
+                shield
+              </mat-icon>
+            }
+          </div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="dueDate">
+        <th mat-header-cell *matHeaderCellDef>Échéance</th>
+        <td mat-cell *matCellDef="let task">{{ task.dueDate | date: 'dateMedium' : '' : 'fr' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef><span class="visually-hidden">Actions</span></th>
+        <td mat-cell *matCellDef="let task">
+          @if (isPending(task.id)) {
+            <mat-spinner diameter="24" aria-label="Mutation en cours" />
+          } @else {
+            <button
+              matIconButton
+              type="button"
+              aria-label="Actions pour la tâche"
+              [matMenuTriggerFor]="taskMenu"
+            >
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #taskMenu="matMenu">
+              <button mat-menu-item type="button" (click)="taskEditRequested.emit(task)">
+                <mat-icon>edit</mat-icon>
+                Modifier
+              </button>
+              <button mat-menu-item type="button" (click)="taskDeleteRequested.emit(task)">
+                <mat-icon>delete</mat-icon>
+                Supprimer
+              </button>
+            </mat-menu>
+          }
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr
+        mat-row
+        *matRowDef="let row; columns: displayedColumns"
+        [class.task-row--done]="row.status === 'done'"
+      ></tr>
+    </table>
+  </mat-card-content>
+</mat-card>

@@ -1,0 +1,90 @@
+:host {
+  display: block;
+}
+
+.project-header {
+  align-items: flex-end;
+}
+
+.project-header__meta {
+  display: grid;
+  justify-items: end;
+  gap: 1rem;
+}
+
+.task-kpis {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.task-kpis mat-card {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--lab-border);
+}
+
+.task-kpis strong {
+  font-size: 1.8rem;
+}
+
+.task-kpis span {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.state-card,
+.empty-state {
+  display: grid;
+  min-height: 20rem;
+  place-items: center;
+  align-content: center;
+  gap: 0.75rem;
+  padding: 2rem;
+  text-align: center;
+}
+
+.state-card h1,
+.state-card p,
+.empty-state h2,
+.empty-state p {
+  margin: 0;
+}
+
+.state-card--error {
+  border-color: var(--mat-sys-error);
+}
+
+.state-card__actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.empty-state {
+  min-height: 16rem;
+  margin-top: 1rem;
+}
+
+.empty-state > mat-icon,
+.state-card > mat-icon {
+  width: 3.5rem;
+  height: 3.5rem;
+  font-size: 3.5rem;
+  color: var(--mat-sys-primary);
+}
+
+@media (max-width: 720px) {
+  .project-header,
+  .project-header__meta {
+    align-items: flex-start;
+    justify-items: start;
+  }
+
+  .task-kpis {
+    grid-template-columns: 1fr;
+  }
+}

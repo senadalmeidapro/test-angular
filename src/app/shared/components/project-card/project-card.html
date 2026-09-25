@@ -1,0 +1,22 @@
+<mat-card class="project-card" [attr.data-status]="project().status">
+  <mat-card-header>
+    <mat-card-title>{{ project().name }}</mat-card-title>
+    <mat-card-subtitle>Responsable : {{ ownerName() }}</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    <mat-chip-set aria-label="Statut du projet">
+      <mat-chip [highlighted]="project().status === 'active'">{{ statusLabel() }}</mat-chip>
+    </mat-chip-set>
+    <p class="project-card__description">{{ project().description }}</p>
+    <p class="project-card__date">
+      <mat-icon>event</mat-icon>
+      Échéance : {{ project().dueDate | date: 'dateMedium' : '' : 'fr' }}
+    </p>
+  </mat-card-content>
+  <mat-card-actions align="end">
+    <button matButton="filled" type="button" (click)="projectSelected.emit(project())">
+      Ouvrir
+      <mat-icon iconPositionEnd>arrow_forward</mat-icon>
+    </button>
+  </mat-card-actions>
+</mat-card>

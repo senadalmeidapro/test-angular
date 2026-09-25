@@ -1,0 +1,118 @@
+<section class="page-shell dashboard-page">
+  <header class="page-header dashboard-hero">
+    <div>
+      <p class="eyebrow">Angular Lab</p>
+      <h1>Project Management Dashboard</h1>
+      <p>
+        Une application réelle pour observer les composants, le flux de données, les Signals et la
+        détection des changements.
+      </p>
+    </div>
+    <button
+      matButton="tonal"
+      type="button"
+      [disabled]="projectStore.loadState() === 'loading'"
+      (click)="refresh()"
+    >
+      <mat-icon>refresh</mat-icon>
+      Actualiser
+    </button>
+  </header>
+
+  <div class="status-strip" aria-live="polite">
+    <span>État HTTP :</span>
+    <mat-chip [class]="'state-chip state-chip--' + projectStore.loadState()">
+      {{ projectStore.loadState() }}
+    </mat-chip>
+    @if (userStore.loadState() !== 'success') {
+      <span>Utilisateurs : {{ userStore.loadState() }}</span>
+    }
+  </div>
+
+  @if (projectStore.loadState() === 'idle') {
+    <mat-card class="state-card">
+      <mat-progress-bar mode="indeterminate" />
+      <h2>Initialisation du dashboard</h2>
+    </mat-card>
+  } @else if (projectStore.loadState() === 'loading') {
+    <mat-card class="state-card">
+      <mat-progress-bar mode="indeterminate" />
+      <h2>Chargement des projets…</h2>
+    </mat-card>
+  } @else if (projectStore.loadState() === 'error') {
+    <mat-card class="state-card state-card--error">
+      <mat-icon>cloud_off</mat-icon>
+      <h2>L’API ne répond pas</h2>
+      <p>{{ projectStore.errorMessage() }}</p>
+      <button matButton="filled" type="button" (click)="refresh()">Réessayer</button>
+    </mat-card>
+  } @else if (projectStore.loadState() === 'empty') {
+    <mat-card class="empty-state">
+      <mat-icon>folder_open</mat-icon>
+      <h2>Aucun projet</h2>
+      <p>
+        L’API a répondu avec une collection vide : l’état <code>empty</code> est distinct de
+        l’erreur.
+      </p>
+    </mat-card>
+  } @else {
+    <section class="stats-grid" aria-label="Statistiques des projets">
+      <app-stat-card
+        label="Projets"
+        [value]="projectStore.totalProjectCount()"
+        icon="folder"
+        hint="Collection chargée par HttpClient"
+      />
+      <app-stat-card
+        label="Projets actifs"
+        [value]="projectStore.activeProjectCount()"
+        icon="play_circle"
+        hint="Valeur dérivée par computed"
+        tone="accent"
+      />
+      <app-stat-card
+        label="Projets terminés"
+        [value]="projectStore.completedProjectCount()"
+        icon="task_alt"
+        hint="Même source, autre dérivation"
+        tone="warning"
+      />
+      <app-stat-card
+        label="Équipe"
+        [value]="userStore.users().length"
+        icon="group"
+        hint="Observable converti avec toSignal"
+      />
+    </section>
+
+    <section class="projects-section">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Portefeuille</p>
+          <h2>Projets</h2>
+        </div>
+        <span
+          >{{ projectStore.projects().length }} élément(s) trackés par <code>&#64;for</code></span
+        >
+      </div>
+
+      <div class="project-grid">
+        @for (project of projectStore.projects(); track project.id) {
+          <app-project-card
+            [project]="project"
+            [users]="userStore.users()"
+            (projectSelected)="openProject($event)"
+          />
+        } @empty {
+          <mat-card class="empty-state">
+            <mat-icon>folder_off</mat-icon>
+            <h2>La boucle n’a rien à afficher</h2>
+            <p>Le bloc <code>&#64;empty</code> ne se rend que pour une collection vide.</p>
+          </mat-card>
+        }
+      </div>
+    </section>
+
+    <app-change-detection-lab />
+  }
+</section>
