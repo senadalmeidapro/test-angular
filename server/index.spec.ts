@@ -7,7 +7,7 @@ import { createApiApp } from './index.js';
 
 let server: Server;
 let baseUrl: string;
-let originalTasks = structuredClone(tasks);
+const originalTasks = structuredClone(tasks);
 
 before(async () => {
   server = createApiApp({ latencyMs: 0 }).listen(0);
@@ -52,7 +52,7 @@ describe('API Angular Lab', () => {
     });
   });
 
-  test('exécute le cycle de vie complet d’une tâche', async () => {
+  test('exécute le cycle de vie complet et accepte le payload réel du formulaire', async () => {
     const createResponse = await fetch(`${baseUrl}/projects/project-portal/tasks`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
@@ -66,32 +66,89 @@ describe('API Angular Lab', () => {
     const updateResponse = await fetch(`${baseUrl}/tasks/${created.id}`, {
       method: 'PATCH',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ status: 'done' }),
+      body: JSON.stringify({ ...validTaskPayload(), status: 'done' }),
     });
     assert.equal(updateResponse.status, 200);
-    assert.equal(((await updateResponse.json()) as { status: string }).status, 'done');
+    const updated = (await updateResponse.json()) as { status: string; riskMitigation: string };
+    assert.equal(updated.status, 'done');
+    assert.equal(updated.riskMitigation, '');
 
     const deleteResponse = await fetch(`${baseUrl}/tasks/${created.id}`, { method: 'DELETE' });
     assert.equal(deleteResponse.status, 204);
   });
 
-  test('valide les énumérations et les ressources liées', async () => {
-    const invalidStatus = await fetch(`${baseUrl}/projects/project-portal/tasks`, {
+  test('valide strictement les types et les dates calendaires', async () => {
+    const invalidAssignee = await createTask({ ...validTaskPayload(), assigneeId: 42 });
+    assert.equal(invalidAssignee.status, 400);
+    assert.deepEqual(await invalidAssignee.json(), { message: 'Le responsable est obligatoire.' });
+
+    const invalidDescription = await createTask({ ...validTaskPayload(), description: 42 });
+    assert.equal(invalidDescription.status, 400);
+    assert.deepEqual(await invalidDescription.json(), {
+      message: 'La description doit être une chaîne de caractères.',
+    });
+
+    const invalidDate = await createTask({ ...validTaskPayload(), dueDate: '2026-02-30' });
+    assert.equal(invalidDate.status, 400);
+    assert.deepEqual(await invalidDate.json(), {
+      message: 'L’échéance doit être une date ISO valide.',
+    });
+  });
+
+  test('normalise la checklist sans accepter de propriétés arbitraires', async () => {
+    const originalTask = tasks.find((task) => task.id === 'task-1');
+    assert.ok(originalTask);
+    const originalChecklistId = originalTask.checklist[0]?.id;
+    assert.ok(originalChecklistId);
+
+    const response = await fetch(`${baseUrl}/tasks/task-1`, {
+      method: 'PATCH',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        checklist: [{ label: '  Valider la correction  ', done: false, injected: 'not allowed' }],
+      }),
+    });
+
+    assert.equal(response.status, 200);
+    const updated = (await response.json()) as {
+      checklist: Array<{ id: string; label: string; done: boolean }>;
+    };
+    assert.deepEqual(Object.keys(updated.checklist[0] ?? {}).sort(), ['done', 'id', 'label']);
+    assert.equal(updated.checklist[0]?.id, originalChecklistId);
+    assert.equal(updated.checklist[0]?.label, 'Valider la correction');
+  });
+
+  test('normalise les erreurs du parseur JSON et de la taille du corps', async () => {
+    const malformedJson = await fetch(`${baseUrl}/projects/project-portal/tasks`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ ...validTaskPayload(), status: 'unknown' }),
+      body: '{not-json',
     });
-    assert.equal(invalidStatus.status, 400);
+    assert.equal(malformedJson.status, 400);
+    assert.deepEqual(await malformedJson.json(), {
+      message: 'Le corps de la requête contient un JSON invalide.',
+    });
 
-    const invalidUser = await fetch(`${baseUrl}/projects/project-portal/tasks`, {
+    const oversizedBody = await fetch(`${baseUrl}/projects/project-portal/tasks`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ ...validTaskPayload(), assigneeId: 'missing' }),
+      body: JSON.stringify({ value: 'x'.repeat(101 * 1024) }),
     });
-    assert.equal(invalidUser.status, 400);
+    assert.equal(oversizedBody.status, 413);
+    assert.deepEqual(await oversizedBody.json(), {
+      message: 'La charge utile ne peut pas dépasser 100 kB.',
+    });
+  });
 
-    const missingProject = await fetch(`${baseUrl}/projects/missing/tasks`);
-    assert.equal(missingProject.status, 404);
+  test('expose les erreurs de panne simulée et de ressource absente', async () => {
+    const simulatedFailure = await fetchJson('/projects?simulateError=true', 503);
+    assert.deepEqual(simulatedFailure, { message: 'Panne simulée de l’API.' });
+
+    const missingProject = await fetchJson('/projects/missing', 404);
+    assert.deepEqual(missingProject, { message: 'Projet introuvable.' });
+
+    const unknownRoute = await fetchJson('/unknown', 404);
+    assert.deepEqual(unknownRoute, { message: 'Route inconnue : GET /unknown' });
   });
 });
 
@@ -109,8 +166,16 @@ function validTaskPayload(): Record<string, unknown> {
   };
 }
 
-async function fetchJson(path: string): Promise<unknown> {
+function createTask(payload: Record<string, unknown>): Promise<Response> {
+  return fetch(`${baseUrl}/projects/project-portal/tasks`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+}
+
+async function fetchJson(path: string, expectedStatus = 200): Promise<unknown> {
   const response = await fetch(`${baseUrl}${path}`);
-  assert.equal(response.status, 200);
+  assert.equal(response.status, expectedStatus);
   return response.json();
 }

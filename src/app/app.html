@@ -1,4 +1,16 @@
+<!--
+  [Angular — Material] `mat-toolbar`, `mat-icon` et `matButton`
+  Contexte : la barre supérieure regroupe la marque, la navigation et des actions.
+  Objectif : rendre les composants et directives Material utilisés par le shell.
+  Justification : ces éléments providen les behaviours visuels et accessibles du Material Design.
+-->
 <mat-toolbar class="app-toolbar">
+  <!--
+    [Angular — Router] `routerLink`
+    Contexte : la marque sert de lien vers la page d’accueil de l’application.
+    Objectif : transformer cet élément en navigation déclarative.
+    Justification : le routeur devient l’unique source de vérité pour l’URL affichée.
+  -->
   <a class="brand" routerLink="/dashboard" aria-label="Angular Lab — accueil">
     <span class="brand__mark"><mat-icon>terminal</mat-icon></span>
     <span>
@@ -7,6 +19,12 @@
     </span>
   </a>
 
+  <!--
+    [Angular — Router] `routerLink`, `routerLinkActive` et `routerLinkActiveOptions`
+    Contexte : le lien de navigation doit être actif uniquement sur le dashboard exact.
+    Objectif : piloter l’URL et l’état actif de la navigation.
+    Justification : `exact: true` évite de considérer les sous-URL comme le dashboard.
+  -->
   <nav class="app-nav" aria-label="Navigation principale">
     <a
       matButton
@@ -21,6 +39,12 @@
 
   <span class="app-toolbar__spacer"></span>
 
+  <!--
+    [Angular — Material] `matIconButton`, `[matTooltip]` et `[attr.aria-label]`
+    Contexte : le bouton de densité expose une action et une description accessibles.
+    Objectif : mettre à jour le texte de l’icône, l’infobulle et l’étiquette ARIA depuis le Signal de préférences.
+    Justification : Angular réévalue ces bindings lorsque la valeur lue change.
+  -->
   <button
     matIconButton
     type="button"
@@ -33,6 +57,12 @@
     <mat-icon>{{ preferences.isCompact() ? 'density_medium' : 'density_small' }}</mat-icon>
   </button>
 
+  <!--
+    [Angular — Material] `matIconButton` et `[matMenuTriggerFor]`
+    Contexte : la seconde action ouvre le menu applicatif.
+    Objectif : relier le bouton à la référence Material du menu.
+    Justification : la liaison permet à Material de gérer l’ouverture et le positionnement du panneau.
+  -->
   <button
     matIconButton
     type="button"
@@ -41,6 +71,13 @@
   >
     <mat-icon>more_vert</mat-icon>
   </button>
+
+  <!--
+    [Angular — Material] `mat-menu`, `mat-menu-item` et `routerLink`
+    Contexte : le menu contient des liens vers deux espaces de travail.
+    Objectif : rendre le menu navigable avec la même directive Router que la barre principale.
+    Justification : la navigation reste déclarative et le routeur conserve la cohérence de l’historique.
+  -->
   <mat-menu #applicationMenu="matMenu">
     <a mat-menu-item routerLink="/dashboard">
       <mat-icon>dashboard</mat-icon>
@@ -53,7 +90,19 @@
   </mat-menu>
 </mat-toolbar>
 
+<!--
+  [Angular — Liaison de propriété] `[class.app-content--compact]`
+  Contexte : la classe de contenu reflète la préférence de densité.
+  Objectif : appliquer ou retirer une classe CSS selon l’état du Signal.
+  Justification : la liaison évite de dupliquer la logique de bascule dans une méthode de rendu.
+-->
 <main class="app-content" [class.app-content--compact]="preferences.isCompact()">
+  <!--
+    [Angular — Router] `router-outlet`
+    Contexte : le shell accueille la feature correspondant à l’URL active.
+    Objectif : fournir le point d’ancrage où le routeur insère le composant chargé.
+    Justification : cette directive est le mécanisme de composition entre le routage et les vues.
+  -->
   <router-outlet />
 </main>
 

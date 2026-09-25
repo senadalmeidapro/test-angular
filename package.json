@@ -13,7 +13,8 @@
     "api:check": "tsc --project tsconfig.server.json --noEmit",
     "api:test": "tsx --test server/index.spec.ts",
     "test": "ng test",
-    "test:ci": "ng test --watch=false",
+    "test:ci:web": "ng test --watch=false",
+    "test:ci": "npm run test:ci:web && npm run api:test",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },

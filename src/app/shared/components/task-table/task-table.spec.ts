@@ -5,6 +5,11 @@ import { TaskTable } from './task-table';
 import { TaskStatusChange } from '../../../core/models/task.model';
 import { makeTask, USERS } from '../../../testing/test-data';
 
+// [Angular Common — Locale] `registerLocaleData`
+// Contexte : rendre la locale française disponible pour le formatage du tableau.
+// Objectif : reproduire les dates et libellés attendus par le template.
+// Justification : éviter une dépendance à la configuration linguistique du navigateur.
+
 registerLocaleData(localeFr);
 
 describe('TaskTable', () => {

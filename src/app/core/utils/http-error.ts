@@ -1,6 +1,14 @@
+// [Angular — Imports Angular] `HttpErrorResponse`
+// Contexte : cette fonction transforme les rejets des clients HTTP en messages affichables.
+// Objectif : importer la classe Angular qui représente une réponse HTTP en erreur.
+// Justification : elle permet de distinguer une erreur HTTP d’une exception inconnue avant d’en lire les détails.
 import { HttpErrorResponse } from '@angular/common/http';
 
 export function toErrorMessage(error: unknown, fallback: string): string {
+  // [Angular — HTTP — gestion des erreurs] `error instanceof HttpErrorResponse`, `error.status`, `error.error`, `error.message`
+  // Contexte : un appel peut rejeter avec une valeur inconnue, mais `HttpClient` produit normalement cette classe d’erreur.
+  // Objectif : vérifier le type, puis consulter `status`, le corps `error` et le message selon le cas.
+  // Justification : ce test de type protège les accès aux propriétés et permet un message cohérent sans exposer de détail technique brutal.
   if (!(error instanceof HttpErrorResponse)) {
     return fallback;
   }

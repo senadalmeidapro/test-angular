@@ -1,6 +1,6 @@
 # Angular Lab — Project Management Dashboard
 
-Laboratoire Angular 22 centré sur une application réelle de gestion de projets et de tâches. Le frontendzoneless combine Signals, components standalone, `OnPush`, formulaires typés, Angular Material, routage lazy et HttpClient. Une API Express TypeScript en mémoire fournit les données.
+Laboratoire Angular 22 centré sur une application réelle de gestion de projets et de tâches. Le frontend zoneless combine Signals, composants standalone, `OnPush`, formulaires typés, Angular Material, routage lazy et `HttpClient`. Une API Express TypeScript en mémoire fournit les données.
 
 ## Versions validées
 
@@ -37,7 +37,8 @@ Les données sont conservées en mémoire jusqu’à l’arrêt du serveur API.
 | `npm run typecheck`    | Compile l’application Angular en mode développement    |
 | `npm run api:check`    | Vérifie les types TypeScript du serveur                |
 | `npm test`             | Lance Vitest en mode watch                             |
-| `npm run test:ci`      | Lance tous les tests Angular une fois                  |
+| `npm run test:ci`      | Lance les tests Angular et Express une fois            |
+| `npm run test:ci:web`  | Lance uniquement les tests Angular une fois            |
 | `npm run api:test`     | Lance les tests de contrat HTTP Express                |
 | `npm run format`       | Applique Prettier                                      |
 | `npm run format:check` | Vérifie le formatage sans modifier les fichiers        |

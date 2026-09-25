@@ -2,6 +2,16 @@ import { TestBed } from '@angular/core/testing';
 import { TaskFilterBar } from './task-filter-bar';
 
 describe('TaskFilterBar', () => {
+// [Angular Test — `TestBed`] `TestBed.configureTestingModule`
+// Contexte : déclarer la barre de filtres et ses composants Material.
+// Objectif : construire un injecteur isolé pour les interactions du template.
+// Justification : tester le composant sans état global ni rendu partagé.
+
+// [Angular Test — `TestBed`] `compileComponents`
+// Contexte : préparer les templates des composants Material importés.
+// Objectif : rendre le DOM interactif avant la création de la fixture.
+// Justification : éviter une initialisation incomplète des directives.
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({ imports: [TaskFilterBar] }).compileComponents();
   });

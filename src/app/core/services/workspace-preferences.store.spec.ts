@@ -47,7 +47,12 @@ describe('WorkspacePreferencesStore', () => {
     });
 
     expect(() => {
-      const store = TestBed.inject(WorkspacePreferencesStore);
+// [Angular Test — `TestBed.inject`] `inject`
+// Contexte : résoudre le store de préférences depuis l’injecteur de test.
+// Objectif : obtenir l’instance isolée qui pilote la densité globale.
+// Justification : éviter de partager une dépendance entre scénarios et rendre les lectures reproductibles.
+
+    const store = TestBed.inject(WorkspacePreferencesStore);
       store.toggleDensity();
       TestBed.flushEffects();
     }).not.toThrow();

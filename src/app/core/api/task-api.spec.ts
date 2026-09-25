@@ -9,6 +9,26 @@ describe('TaskApi', () => {
   let api: TaskApi;
   let http: HttpTestingController;
 
+// [Angular Test — `TestBed`] `TestBed.configureTestingModule`
+// Contexte : déclarer le client HTTP de l’API des tâches et son double de test.
+// Objectif : isoler les providers du service.
+// Justification : rendre les méthodes et verbes HTTP déterministes.
+
+// [Angular HTTP — Injection] `provideHttpClient`
+// Contexte : fournir l’implémentation Angular utilisée par `TaskApi`.
+// Objectif : observer la construction réelle des requêtes.
+// Justification : ne pas remplacer le client au niveau du code métier.
+
+// [Angular HTTP — Test] `provideHttpClientTesting`
+// Contexte : brancher le contrôleur qui remplace le réseau.
+// Objectif : inspecter puis compléter les appels de l’API.
+// Justification : contrôler les réponses sans dépendance extérieure.
+
+// [Angular Test — `TestBed.inject`] `inject`
+// Contexte : résoudre l’API et son contrôleur depuis l’injecteur du test.
+// Objectif : faire exercer le même graphe de dépendances qu’en production.
+// Justification : garantir l’isolation du scénario.
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
@@ -20,6 +40,11 @@ describe('TaskApi', () => {
     api = TestBed.inject(TaskApi);
     http = TestBed.inject(HttpTestingController);
   });
+
+// [Angular HTTP — Vérification] `HttpTestingController.verify`
+// Contexte : clôturer le scénario après l’appel de l’API des tâches.
+// Objectif : détecter toute requête non consommée par l’API.
+// Justification : garantir que chaque test contrôle son transport.
 
   afterEach(() => http.verify());
 

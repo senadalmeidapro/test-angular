@@ -78,7 +78,7 @@ Résultat attendu à la livraison :
 - le build Angular se termine sans erreur ;
 - le typecheck serveur se termine sans erreur ;
 - 77 tests Angular passent ;
-- 4 tests Express passent ;
+- 7 tests Express passent ;
 - aucune divergence Prettier.
 
 ## Formatage
@@ -133,7 +133,7 @@ La locale française doit être enregistrée avant le bootstrap. `src/main.ts` a
 ng serve --port 4300 --proxy-config proxy.conf.json
 ```
 
-Dans ce cas, ajuster temporairement l’origine CORS de l’API ou revenir au port standard.
+Dans ce cas, lancer l’API avec `CORS_ORIGIN=http://localhost:4300` ou revenir au port standard.
 
 ### Les données disparaissent
 
@@ -142,7 +142,7 @@ C’est le comportement normal : `server/data.ts` fournit un tableau en mémoire
 ## Exercices guidés
 
 1. Ajouter un nouveau statut sans utiliser de `any`.
-2. Ajouter un filtre de priorité et covered le store.
+2. Ajouter un filtre de priorité et le couvrir dans le store.
 3. Ajouter un bouton d’archive pour une tâche.
 4. Créer un interceptor qui ajoute un identifiant de corrélation.
 5. Écrire un test Playwright du parcours création.

@@ -6,6 +6,8 @@ import {
   minimumChecklistItems,
   nonBlank,
   TaskEditorDialog,
+  trimmedMinimumLength,
+  validIsoDate,
 } from './task-editor-dialog';
 import { TaskEditorDialogData, TaskEditorValue } from '../../../core/models/task-editor.model';
 import { makeTask, USERS } from '../../../testing/test-data';
@@ -14,6 +16,11 @@ interface DialogHarness {
   submit(): void;
   cancel(): void;
 }
+
+// [Angular Test — `TestBed.resetTestingModule`] `resetTestingModule`
+// Contexte : réinitialiser l’injecteur avant chaque construction de dialogue.
+// Objectif : conserver des données et une référence de fermeture neuves.
+// Justification : empêcher les instances de providers Material de fuite entre scénarios.
 
 describe('TaskEditorDialog', () => {
   it('pré-remplit un formulaire existant et émet toutes les valeurs', () => {
@@ -96,6 +103,11 @@ describe('TaskEditorDialog', () => {
   it('normalise les validateurs de formulaire', () => {
     expect(nonBlank(new FormControl(' valide '))).toBeNull();
     expect(nonBlank(new FormControl('   '))).toEqual({ required: true });
+    expect(trimmedMinimumLength(3)(new FormControl(' ab '))).toEqual({
+      minlength: { requiredLength: 3, actualLength: 2 },
+    });
+    expect(validIsoDate(new FormControl('2026-02-30'))).toEqual({ isoDate: true });
+    expect(validIsoDate(new FormControl('2026-02-28'))).toBeNull();
     expect(minimumChecklistItems(2)(new FormControl([{}]))).toEqual({
       minimumItems: { required: 2, actual: 1 },
     });

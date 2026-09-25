@@ -9,6 +9,26 @@ describe('TaskStore', () => {
   let store: TaskStore;
   let http: HttpTestingController;
 
+// [Angular Test — `TestBed`] `TestBed.configureTestingModule`
+// Contexte : déclarer le store, le client HTTP et son adaptateur de test.
+// Objectif : construire un injecteur isolé pour les scénarios de tâches.
+// Justification : contrôler les dépendances et éviter les effets entre tests.
+
+// [Angular HTTP — Injection] `provideHttpClient`
+// Contexte : fournir l’implémentation Angular utilisée par `TaskStore`.
+// Objectif : tester le chemin réel de création des requêtes.
+// Justification : conserver le contrat HTTP du service avant de le simuler.
+
+// [Angular HTTP — Test] `provideHttpClientTesting`
+// Contexte : installer le contrôleur backend qui remplacera les réponses réseau.
+// Objectif : observer et compléter chaque requête du store.
+// Justification : rendre les transitions d’état reproductibles.
+
+// [Angular Test — `TestBed.inject`] `inject`
+// Contexte : résoudre le store et le contrôleur depuis le même injecteur.
+// Objectif : contrôler à la fois l’état du store et ses requêtes.
+// Justification : garantir que le service testé utilise bien les dépendances du scénario.
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
@@ -22,12 +42,27 @@ describe('TaskStore', () => {
     http = TestBed.inject(HttpTestingController);
   });
 
+// [Angular HTTP — Vérification] `HttpTestingController.verify`
+// Contexte : clôturer le scénario après les assertions sur les requêtes.
+// Objectif : détecter toute requête attendue mais non consommée ou restante.
+// Justification : garantir qu’aucune dépendance HTTP ne fuit hors du test.
+
   afterEach(() => http.verify());
 
   it('charge les tâches du projet actif', () => {
     store.loadTasks('project-portal');
     expect(store.loadState()).toBe('loading');
     expect(store.activeProjectId()).toBe('project-portal');
+
+    // [Angular HTTP — Attente] `HttpTestingController.expectOne`
+    // Contexte : sélectionner la requête de chargement des tâches du projet.
+    // Objectif : contrôler précisément l’URL déclenchée par le store.
+    // Justification : rendre le contrat HTTP observable et reproductible.
+
+    // [Angular HTTP — Simulation] `HttpTestingController.flush`
+    // Contexte : injecter la collection de tâches attendue par le store.
+    // Objectif : faire évoluer les Signals d’état sans appel réseau.
+    // Justification : contrôler la transformation de la réponse.
 
     http.expectOne('/api/projects/project-portal/tasks').flush(TASKS);
 

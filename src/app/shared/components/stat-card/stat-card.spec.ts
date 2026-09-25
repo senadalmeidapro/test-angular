@@ -2,6 +2,16 @@ import { TestBed } from '@angular/core/testing';
 import { StatCard } from './stat-card';
 
 describe('StatCard', () => {
+// [Angular Test — `TestBed`] `TestBed.configureTestingModule`
+// Contexte : déclarer la carte statistique et ses directives Material.
+// Objectif : construire un injecteur isolé pour le rendu.
+// Justification : éviter l’état global et garantir un DOM stable.
+
+// [Angular Test — `TestBed`] `compileComponents`
+// Contexte : compiler le composant avant de lui injecter ses entrées.
+// Objectif : préparer le template pour la première détection de changements.
+// Justification : rendre les pipes et directives Material disponibles.
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({ imports: [StatCard] }).compileComponents();
   });

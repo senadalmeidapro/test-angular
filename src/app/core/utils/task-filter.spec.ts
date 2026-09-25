@@ -1,6 +1,11 @@
 import { filterTasks } from './task-filter';
 import { makeTask, TASKS } from '../../testing/test-data';
 
+// [Vitest — TypeScript pur] `filterTasks`
+// Contexte : cette spec vérifie uniquement une fonction utilitaire, sans TestBed ni API Angular.
+// Objectif : contrôler le filtrage, la recherche et la préservation de la collection source.
+// Justification : isoler la logique TypeScript des effets de bord et garder Vitest comme runner.
+
 describe('filterTasks', () => {
   it('retourne tous les éléments pour une recherche vide et le statut all', () => {
     expect(filterTasks(TASKS, { query: '   ', status: 'all' })).toEqual(TASKS);

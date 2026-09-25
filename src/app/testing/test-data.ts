@@ -10,6 +10,7 @@ import { User } from '../core/models/user.model';
 
 export const USERS: readonly User[] = [
   { id: 'user-ada', name: 'Ada Nguyen', role: 'Product owner', initials: 'AN' },
+  { id: 'user-sami', name: 'Sami Benali', role: 'Tech lead', initials: 'SB' },
   { id: 'user-lea', name: 'Léa Martin', role: 'Frontend engineer', initials: 'LM' },
   { id: 'user-noe', name: 'Noé Dubois', role: 'QA engineer', initials: 'ND' },
 ];
@@ -18,29 +19,38 @@ export const PROJECTS: readonly Project[] = [
   {
     id: 'project-portal',
     name: 'Portail client',
-    description: 'Simplifier le parcours de contact.',
+    description: 'Simplifier la prise de contact et le suivi des demandes clients.',
     status: 'active',
     ownerId: 'user-ada',
     dueDate: '2026-10-15',
     createdAt: '2026-07-02T09:00:00.000Z',
   },
   {
+    id: 'project-mobile',
+    name: 'Refonte mobile',
+    description: 'Adapter les parcours essentiels aux écrans tactiles.',
+    status: 'planned',
+    ownerId: 'user-sami',
+    dueDate: '2026-11-30',
+    createdAt: '2026-08-12T09:00:00.000Z',
+  },
+  {
+    id: 'project-payments',
+    name: 'Fiabilité des paiements',
+    description: 'Réduire les échecs de paiement et accélérer le diagnostic.',
+    status: 'active',
+    ownerId: 'user-lea',
+    dueDate: '2026-09-30',
+    createdAt: '2026-06-20T09:00:00.000Z',
+  },
+  {
     id: 'project-docs',
     name: 'Documentation API',
-    description: 'Publier la référence d’intégration.',
+    description: 'Publier une référence claire pour les intégrations partenaires.',
     status: 'completed',
     ownerId: 'user-noe',
     dueDate: '2026-08-31',
     createdAt: '2026-05-11T09:00:00.000Z',
-  },
-  {
-    id: 'project-mobile',
-    name: 'Refonte mobile',
-    description: 'Adapter les parcours tactiles.',
-    status: 'planned',
-    ownerId: 'user-lea',
-    dueDate: '2026-11-30',
-    createdAt: '2026-08-12T09:00:00.000Z',
   },
 ];
 

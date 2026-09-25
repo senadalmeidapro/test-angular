@@ -89,11 +89,14 @@ export class ProjectPage {
     ) {
       return 'loading';
     }
+    if (
+      (this.projectStore.loadState() === 'success' || this.projectStore.loadState() === 'empty') &&
+      !this.projectStore.selectedProject()
+    ) {
+      return 'not-found';
+    }
     if (this.taskStore.loadState() === 'error' || this.projectStore.loadState() === 'error') {
       return 'error';
-    }
-    if (this.projectStore.loadState() === 'success' && !this.projectStore.selectedProject()) {
-      return 'not-found';
     }
     return this.taskStore.loadState();
   });

@@ -9,6 +9,11 @@ import { LAB_API_URL } from '../../core/api/lab-api.tokens';
 import { Project } from '../../core/models/project.model';
 import { PROJECTS, USERS } from '../../testing/test-data';
 
+// [Angular Common — Locale] `registerLocaleData`
+// Contexte : installer les données de locale française pour les pipes de la page.
+// Objectif : contrôler les formats visibles dans le dashboard.
+// Justification : rendre le rendu indépendant de la locale globale du navigateur.
+
 registerLocaleData(localeFr);
 
 interface DashboardHarness {
@@ -30,6 +35,11 @@ describe('DashboardPage', () => {
     });
     http = TestBed.inject(HttpTestingController);
   });
+
+// [Angular HTTP — Vérification] `HttpTestingController.verify`
+// Contexte : clôturer le scénario après le chargement du dashboard.
+// Objectif : vérifier que les requêtes de la page ont toutes été consommées.
+// Justification : éviter une dépendance à des requêtes asynchrones résiduelles.
 
   afterEach(() => http.verify());
 

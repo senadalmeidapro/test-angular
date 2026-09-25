@@ -4,7 +4,7 @@
 
 Le projet combine trois niveaux :
 
-1. tests Angular Vitest pour les fonctions, clients, stores et components ;
+1. tests Angular Vitest pour les fonctions, clients, stores et composants ;
 2. tests Angular pour le routing et l’orchestration des pages ;
 3. tests Node sur l’API Express réelle.
 
@@ -12,10 +12,11 @@ Le projet combine trois niveaux :
 
 ```bash
 npm run test:ci
+npm run test:ci:web
 npm run api:test
 ```
 
-Le premier script utilise `@angular/build:unit-test` avec Vitest 5. Le second utilise le runner de tests intégré à Node avec `tsx`.
+`test:ci` est la porte complète : elle exécute les tests Angular puis les tests Express. `test:ci:web` utilise `@angular/build:unit-test` avec Vitest 5. `api:test` utilise le runner intégré à Node avec `tsx`.
 
 ## Répartition actuelle
 
@@ -24,7 +25,7 @@ Au moment de la livraison :
 - 22 fichiers de specs Angular ;
 - 77 tests Angular ;
 - 1 fichier de tests serveur ;
-- 4 tests de contrat Express.
+- 7 tests de contrat Express.
 
 ## Stratégie
 
@@ -49,7 +50,7 @@ expect(request.request.method).toBe('GET');
 request.flush(TASKS);
 ```
 
-Cela teste method, URL et body sans autoriser une requête non prévue.
+Cela teste la méthode, l’URL et le corps sans autoriser une requête non prévue.
 
 ### Stores
 
@@ -86,14 +87,15 @@ Le dialog est testé avec des providers `MAT_DIALOG_DATA` et `MatDialogRef`. Les
 
 ### API Express
 
-`createApiApp({ latencyMs: 0 })` démarre un serveur sur le port 0. Les tests utilisent `fetch` et un vrai socket sans_FIXME :
+`createApiApp({ latencyMs: 0 })` démarre un serveur sur le port 0. Les tests utilisent `fetch` et un vrai socket HTTP :
 
-- health, projets, utilisateurs ;
-- création, mise à jour, suppression ;
-- mitigation obligatoire ;
+- santé, projets, utilisateurs et panne simulée ;
+- création, mise à jour et suppression avec le payload complet du dialogue ;
+- mitigation obligatoire pour une priorité haute ;
+- types stricts, dates calendaires et ressources liées ;
+- checklist normalisée sans propriétés arbitraires ;
 - dédoublonnage des tags ;
-- statut et responsable invalides ;
-- projet absent.
+- erreurs de JSON mal formé, corps trop volumineux, projet absent et route inconnue.
 
 Le tableau de tâches est restauré après chaque test.
 
@@ -130,15 +132,15 @@ Pour un debounce, utiliser `vi.useFakeTimers()` uniquement dans le test qui mani
 
 ## HttpTestingController
 
-Always plan `afterEach(() => http.verify())`. Cette assertion détecte :
+Planifiez toujours `afterEach(() => http.verify())`. Cette assertion détecte :
 
-- une requête forgotten ;
+- une requête oubliée ;
 - une URL incorrecte ;
-- un HTTP call qui ne correspond pas au contrat.
+- un appel HTTP qui ne correspond pas au contrat.
 
 ## Tests API et latence
 
-Le serveur de production simule 300 ms de latence. `createApiApp` permet de passer `latencyMs: 0` dans les tests. Les tests frontend utilisent le backend de test Angular, donc ils n’attendent pas de socket.
+Le serveur de production simule 300 ms de latence. `createApiApp` permet de passer `latencyMs: 0` dans les tests. Les tests frontend utilisent le backend de test d’Angular ; ils n’utilisent donc pas de socket.
 
 ## Ce qui n’est pas couvert
 
@@ -147,7 +149,7 @@ Le serveur de production simule 300 ms de latence. `createApiApp` permet de pass
 - performance runtime ;
 - responsive visuel ;
 - régression de layout ;
-- persistence après redémarrage.
+- persistance après redémarrage.
 
 ## Ajouter un test
 

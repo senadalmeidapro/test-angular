@@ -9,6 +9,26 @@ describe('ProjectStore', () => {
   let store: ProjectStore;
   let http: HttpTestingController;
 
+// [Angular Test — `TestBed`] `TestBed.configureTestingModule`
+// Contexte : déclarer les dépendances HTTP du store de projets.
+// Objectif : créer un injecteur dédié à chaque scénario.
+// Justification : éviter l’état global et rendre les réponses simulées déterministes.
+
+// [Angular HTTP — Injection] `provideHttpClient`
+// Contexte : fournir le client HTTP consommé par `ProjectStore`.
+// Objectif : préserver le chemin d’injection utilisé en production.
+// Justification : tester le service avant de remplacer uniquement le transport.
+
+// [Angular HTTP — Test] `provideHttpClientTesting`
+// Contexte : brancher le contrôleur de requêtes de test.
+// Objectif : contrôler les appels, réponses et erreurs du store.
+// Justification : ne dépendre d’aucune API distante pendant le test.
+
+// [Angular Test — `TestBed.inject`] `inject`
+// Contexte : injecter le store et le contrôleur HTTP du module courant.
+// Objectif : manipuler l’état et son transport dans un même contexte.
+// Justification : garantir l’isolation entre scénarios.
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
@@ -21,6 +41,11 @@ describe('ProjectStore', () => {
     http = TestBed.inject(HttpTestingController);
   });
 
+// [Angular HTTP — Vérification] `HttpTestingController.verify`
+// Contexte : clôturer le scénario après les assertions sur les requêtes.
+// Objectif : détecter toute requête attendue mais non consommée ou restante.
+// Justification : garantir qu’aucune dépendance HTTP ne fuit hors du test.
+
   afterEach(() => http.verify());
 
   it('passe de loading à success et dérive les compteurs', () => {
@@ -31,8 +56,8 @@ describe('ProjectStore', () => {
 
     expect(store.loadState()).toBe('success');
     expect(store.projects()).toEqual(PROJECTS);
-    expect(store.totalProjectCount()).toBe(3);
-    expect(store.activeProjectCount()).toBe(1);
+    expect(store.totalProjectCount()).toBe(4);
+    expect(store.activeProjectCount()).toBe(2);
     expect(store.completedProjectCount()).toBe(1);
   });
 

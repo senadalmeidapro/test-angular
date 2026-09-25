@@ -32,7 +32,7 @@ Les templates utilisent `@if`, `@else if`, `@else`, `@for` et `@empty`.
 }
 ```
 
-`track project.id`，稳定 l’identité de chaque ligne. Une clé métier reste préférable à l’index lorsque l’item possède un identifiant.
+`track project.id` stabilise l’identité de chaque ligne. Une clé métier reste préférable à l’index lorsque l’item possède un identifiant.
 
 ## Signals
 
@@ -57,7 +57,7 @@ readonly activeProjectCount = computed(
 
 ### Effet
 
-`WorkspacePreferencesStore` utilise `effect` pour lire un Signal et écrire dans `localStorage`. Cette API imperative externe est un effet légitime ; un état dérivé ne doit pas être stocké ainsi.
+`WorkspacePreferencesStore` utilise `effect` pour lire un Signal et écrire dans `localStorage`. Cette API impérative externe est un effet légitime ; un état dérivé ne doit pas être stocké ainsi.
 
 ### Conversion d’Observable
 
@@ -104,16 +104,22 @@ Le template ne connaît pas l’algorithme de filtrage. Il demande simplement la
 
 Les deux modèles sont complémentaires :
 
-- RxJS orchestre les flux, erreurs, Annulation et combinaison ;
+- RxJS orchestre les flux, les erreurs, l’annulation et la combinaison ;
 - Signals représentent l’état lu par les templates ;
 - `toObservable` transforme un Signal en source pour `debounceTime` ;
 - `toSignal` transforme un Observable en état lisible par un template.
 
 ```ts
-toObservable(this.searchTerm)
-  .pipe(debounceTime(250), distinctUntilChanged(), takeUntilDestroyed())
-  .subscribe((query) => this.debouncedSearch.set(query));
+private readonly searchChanges = toObservable(this.searchTerm);
+
+constructor() {
+  this.searchChanges
+    .pipe(debounceTime(250), distinctUntilChanged(), takeUntilDestroyed())
+    .subscribe((query) => this.debouncedSearch.set(query));
+}
 ```
+
+`toObservable` doit être appelé dans un contexte d’injection, par exemple lors de l’initialisation d’un champ ou dans le constructeur.
 
 ## HTTP
 
@@ -141,13 +147,13 @@ Les stores convergent vers :
 - message métier JSON ;
 - ressource absente ;
 - erreur serveur ;
-- fallback HttpClient ou caller.
+- valeur de repli du client HTTP ou de l’appelant.
 
-Le message utilisateur ne révèle ni stack trace ni détail interne sensible.
+Le message utilisateur ne révèle ni pile d’exécution ni détail interne sensible.
 
 ## Routage
 
-Les routes sont lazy :
+Les routes sont chargées à la demande :
 
 ```ts
 {
@@ -161,20 +167,20 @@ Les routes sont lazy :
 
 ## Zoneless
 
-Le projet ne dépend pas de Zone.js. Les mises à jour sont déclenchées par :
+Le projet ne dépend pas de Zone.js. Le runtime planifie la vérification lorsque ses APIs core le notifient, notamment :
 
-- les événements Angular ;
-- la propagation des Signals ;
-- les callbacks HTTP/RAF explicitement supportés par le runtime ;
-- les加载s de Marked-for-checketing et l.programmation destasks.
+- un Signal lu dans un template change de valeur ;
+- un listener lié à une vue est exécuté ;
+- `ComponentRef.setInput` modifie une entrée ;
+- une vue précédemment marquée comme devant être vérifiée est attachée à l’arbre de rendu.
 
 Le test doit utiliser `fixture.detectChanges()` ou attendre `fixture.whenStable()` après une mutation externe.
 
 ## OnPush
 
-Tous les components applicatifs déclarent `OnPush`, y compris les components purement statiques. Les entrées sont des Signals ou des valeurs stables, ce qui permet à Angular de ne vérifier une vue que lorsqu’elle est réellement invalidée.
+Tous les composants applicatifs déclarent `OnPush`, y compris les composants purement statiques. Les entrées sont des Signals ou des valeurs stables, ce qui permet à Angular de ne vérifier une vue que lorsqu’elle est réellement invalidée.
 
-Le component `EagerProbe` est l’exception pédagogique qui permet de comparer l’ancienne stratégie Always Check, renommée `Eager`, à `OnPush`.
+Le composant `EagerProbe` est l’exception pédagogique qui permet de comparer la stratégie `Eager`, anciennement nommée `Default`, à `OnPush`.
 
 ## TypeScript strict
 
@@ -182,8 +188,8 @@ Le component `EagerProbe` est l’exception pédagogique qui permet de comparer 
 - `strictTemplates: true` ;
 - unions fermées pour les statuts et priorités ;
 - modèles de formulaires typés ;
-- aucun casting laxiste du corps HTTP vers un type métier sans validation conceptuale côté serveur.
+- aucun casting laxiste du corps HTTP vers un type métier sans validation à l’exécution côté serveur.
 
 ## Angular Material
 
-Material fournit les interactions et l’accessibilité de Button, Dialog, Form Field, Select, Table, Chips et SnackBar. Le thème utilize l’API Sass `mat.theme`, les palettes Azure/Violet et les variables `mat-sys-*`.
+Material fournit les interactions et l’accessibilité de Button, Dialog, Form Field, Select, Table, Chips et SnackBar. Le thème utilise l’API Sass `mat.theme`, les palettes Azure/Violet et les variables `mat-sys-*`.

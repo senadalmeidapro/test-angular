@@ -73,6 +73,8 @@
         <input matInput type="date" formControlName="dueDate" />
         @if (taskForm.controls.dueDate.hasError('required')) {
           <mat-error>La date d’échéance est obligatoire.</mat-error>
+        } @else if (taskForm.controls.dueDate.hasError('isoDate')) {
+          <mat-error>Saisissez une date calendaire valide.</mat-error>
         }
       </mat-form-field>
     </div>

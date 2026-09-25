@@ -1,6 +1,11 @@
 import { routes } from './app.routes';
 import { TaskStore } from './core/services/task-store';
 
+// [Angular Router — Configuration] `Routes`, `Route.loadComponent` et `Route.providers`
+// Contexte : vérifier la configuration des routes, dont le chargement différé et les providers de portée.
+// Objectif : contrôler la destination racine, les pages et l’isolation du store au niveau de la route.
+// Justification : garder le contrat de navigation explicite avant de tester les composants chargés.
+
 describe('app routes', () => {
   it('redirige la racine vers le dashboard', () => {
     expect(routes[0]).toMatchObject({ path: '', pathMatch: 'full', redirectTo: 'dashboard' });

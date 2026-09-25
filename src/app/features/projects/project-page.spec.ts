@@ -15,6 +15,11 @@ import { Task } from '../../core/models/task.model';
 import { TaskStore } from '../../core/services/task-store';
 import { makeTask, PROJECTS, TASKS, USERS } from '../../testing/test-data';
 
+// [Angular Common — Locale] `registerLocaleData`
+// Contexte : installer les données de locale française utilisées par les pipes du composant.
+// Objectif : reproduire le formatage attendu dans le template de la page projet.
+// Justification : stabiliser les dates et textes affichés sans dépendre de la locale globale du navigateur.
+
 registerLocaleData(localeFr);
 
 interface ProjectPageHarness {
@@ -52,6 +57,11 @@ describe('ProjectPage', () => {
     });
     http = TestBed.inject(HttpTestingController);
   });
+
+// [Angular HTTP — Vérification] `HttpTestingController.verify`
+// Contexte : clôturer le scénario de page après ses appels API.
+// Objectif : détecter les requêtes laissées en attente par le composant.
+// Justification : garantir que la fixture ne dépend pas d’un état HTTP caché.
 
   afterEach(() => http.verify());
 
@@ -98,7 +108,9 @@ describe('ProjectPage', () => {
     http
       .expectOne('/api/projects')
       .flush(PROJECTS.filter((project) => project.id !== 'project-portal'));
-    http.expectOne('/api/projects/project-portal/tasks').flush([]);
+    http
+      .expectOne('/api/projects/project-portal/tasks')
+      .flush({ message: 'Projet introuvable.' }, { status: 404, statusText: 'Not Found' });
     await fixture.whenStable();
     fixture.detectChanges();
 

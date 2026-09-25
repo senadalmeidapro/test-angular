@@ -1,5 +1,5 @@
 import cors from 'cors';
-import express, { Request, RequestHandler, Response } from 'express';
+import express, { NextFunction, Request, RequestHandler, Response } from 'express';
 import { randomUUID } from 'node:crypto';
 import { projects, tasks, users } from './data.js';
 import { ChecklistItemInput, CreateTaskRequest, Task, TaskPriority, TaskStatus } from './types.js';
@@ -13,7 +13,7 @@ export function createApiApp(options: ApiAppOptions = {}): express.Express {
   const latencyMs = options.latencyMs ?? 300;
 
   app.disable('x-powered-by');
-  app.use(cors({ origin: 'http://localhost:4200' }));
+  app.use(cors({ origin: process.env['CORS_ORIGIN'] ?? 'http://localhost:4200' }));
   app.use(express.json({ limit: '100kb' }));
 
   if (latencyMs > 0) {
@@ -73,9 +73,19 @@ export function createApiApp(options: ApiAppOptions = {}): express.Express {
       return;
     }
 
-    const title = typeof body.title === 'string' ? body.title.trim() : '';
+    if (typeof body.title !== 'string') {
+      sendValidationError(response, 'Le titre doit être une chaîne de caractères.');
+      return;
+    }
+
+    const title = body.title.trim();
     if (title.length < 3 || title.length > 100) {
       sendValidationError(response, 'Le titre doit contenir entre 3 et 100 caractères.');
+      return;
+    }
+
+    if (body.description !== undefined && typeof body.description !== 'string') {
+      sendValidationError(response, 'La description doit être une chaîne de caractères.');
       return;
     }
 
@@ -97,7 +107,12 @@ export function createApiApp(options: ApiAppOptions = {}): express.Express {
       return;
     }
 
-    const assigneeId = typeof body.assigneeId === 'string' ? body.assigneeId : users[0].id;
+    if (typeof body.assigneeId !== 'string') {
+      sendValidationError(response, 'Le responsable est obligatoire.');
+      return;
+    }
+
+    const assigneeId = body.assigneeId;
     if (!users.some((user) => user.id === assigneeId)) {
       sendValidationError(response, 'Le responsable sélectionné est introuvable.');
       return;
@@ -121,7 +136,13 @@ export function createApiApp(options: ApiAppOptions = {}): express.Express {
       return;
     }
 
-    const riskMitigation = normalizeRiskMitigation(body.riskMitigation);
+    const riskMitigation =
+      body.riskMitigation === undefined ? '' : normalizeRiskMitigation(body.riskMitigation);
+    if (riskMitigation === null) {
+      sendValidationError(response, 'La mitigation doit être une chaîne de caractères.');
+      return;
+    }
+
     if (priority === 'high' && riskMitigation.length === 0) {
       sendValidationError(response, 'Une priorité haute exige une mesure de mitigation.');
       return;
@@ -206,7 +227,9 @@ export function createApiApp(options: ApiAppOptions = {}): express.Express {
     }
 
     const nextChecklist =
-      body.checklist === undefined ? task.checklist : normalizeChecklist(body.checklist);
+      body.checklist === undefined
+        ? task.checklist
+        : normalizeChecklist(body.checklist, task.checklist);
     if (!nextChecklist) {
       sendValidationError(response, 'La checklist est invalide.');
       return;
@@ -216,7 +239,7 @@ export function createApiApp(options: ApiAppOptions = {}): express.Express {
       body.riskMitigation === undefined
         ? task.riskMitigation
         : normalizeRiskMitigation(body.riskMitigation);
-    if (body.riskMitigation !== undefined && !nextRiskMitigation) {
+    if (nextRiskMitigation === null) {
       sendValidationError(response, 'La mitigation doit être une chaîne de caractères.');
       return;
     }
@@ -255,6 +278,22 @@ export function createApiApp(options: ApiAppOptions = {}): express.Express {
     response.status(404).json({ message: `Route inconnue : ${request.method} ${request.path}` });
   });
 
+  app.use((error: unknown, _request: Request, response: Response, _next: NextFunction): void => {
+    const requestError = error as { readonly type?: string } | null;
+    if (requestError?.type === 'entity.too.large') {
+      response.status(413).json({ message: 'La charge utile ne peut pas dépasser 100 kB.' });
+      return;
+    }
+
+    if (error instanceof SyntaxError && error && 'body' in error) {
+      response.status(400).json({ message: 'Le corps de la requête contient un JSON invalide.' });
+      return;
+    }
+
+    console.error(error);
+    response.status(500).json({ message: 'Une erreur interne du serveur est survenue.' });
+  });
+
   return app;
 }
 
@@ -282,7 +321,8 @@ function isIsoDate(value: string): boolean {
     return false;
   }
 
-  return !Number.isNaN(Date.parse(`${value}T00:00:00.000Z`));
+  const parsedDate = new Date(`${value}T00:00:00.000Z`);
+  return !Number.isNaN(parsedDate.getTime()) && parsedDate.toISOString().slice(0, 10) === value;
 }
 
 function normalizeTags(value: unknown): string[] | null {
@@ -297,20 +337,23 @@ function normalizeTags(value: unknown): string[] | null {
   ];
 }
 
-function normalizeRiskMitigation(value: unknown): string {
-  return typeof value === 'string' ? value.trim() : '';
+function normalizeRiskMitigation(value: unknown): string | null {
+  return typeof value === 'string' ? value.trim() : null;
 }
 
-function normalizeChecklist(value: unknown): Task['checklist'] | null {
-  if (value === undefined) {
-    return [];
-  }
-
+function normalizeChecklist(
+  value: unknown,
+  previousItems: Task['checklist'] = [],
+): Task['checklist'] | null {
   if (!Array.isArray(value) || !value.every(isChecklistInput)) {
     return null;
   }
 
-  return value.flatMap((item) => [{ ...item, id: randomUUID() }]);
+  return value.map((item, index) => ({
+    id: previousItems[index]?.id ?? randomUUID(),
+    label: item.label.trim(),
+    done: item.done,
+  }));
 }
 
 function isChecklistInput(value: unknown): value is ChecklistItemInput {
@@ -327,7 +370,11 @@ function isChecklistInput(value: unknown): value is ChecklistItemInput {
 
 if (require.main === module) {
   const port = Number(process.env['PORT'] ?? 3000);
-  createApiApp().listen(port, () => {
+  if (!Number.isInteger(port) || port < 1 || port > 65_535) {
+    throw new Error('La variable PORT doit contenir un entier entre 1 et 65535.');
+  }
+
+  createApiApp().listen(port, '127.0.0.1', () => {
     console.log(`API Angular Lab disponible sur http://localhost:${port}/api`);
   });
 }

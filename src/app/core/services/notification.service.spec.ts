@@ -6,6 +6,16 @@ describe('NotificationService', () => {
   const snackBar = { open: vi.fn() };
   let service: NotificationService;
 
+// [Angular Test — `TestBed`] `TestBed.configureTestingModule`
+// Contexte : préparer le service de notification dans un injecteur isolé.
+// Objectif : fournir un double Material de test et une instance dédiée.
+// Justification : éviter les notifications globales et rendre les assertions prévisibles.
+
+// [Angular Material — Remplacement] `MatSnackBar`
+// Contexte : remplacer le composant Material par un double qui expose `open`.
+// Objectif : observer les messages produits par le service sans animation ni portail Material.
+// Justification : tester le contrat de notification sans dépendre du DOM global.
+
   beforeEach(() => {
     snackBar.open.mockReset();
     TestBed.configureTestingModule({

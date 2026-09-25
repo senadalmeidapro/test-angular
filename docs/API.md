@@ -20,7 +20,7 @@ Les requêtes et réponses utilisent JSON. Les dates sont des chaînes ISO. Les 
 }
 ```
 
-## Health
+## Santé
 
 ```http
 GET /api/health
@@ -32,13 +32,13 @@ Réponse :
 { "status": "ok" }
 ```
 
-## Users
+## Utilisateurs
 
 ```http
 GET /api/users
 ```
 
-## Projects
+## Projets
 
 ### Liste
 
@@ -66,7 +66,7 @@ GET /api/projects/:projectId
 
 `404` si le projet est absent.
 
-## Tasks
+## Tâches
 
 ### Liste par projet
 
@@ -120,17 +120,18 @@ Le serveur ne modifie que les champs présents. Une priorité haute doit conserv
 DELETE /api/tasks/:taskId
 ```
 
-Réponse `204` sans body.
+Réponse `204` sans corps de réponse.
 
 ## Erreurs de validation
 
-| Code  | Situation                                                                                             |
-| ----- | ----------------------------------------------------------------------------------------------------- |
-| `400` | JSON invalide, titre, description, statut, priorité, responsable, date, tags, checklist ou mitigation |
-| `404` | projet ou tâche absent                                                                                |
-| `404` | route `/api` inconnue                                                                                 |
-| `503` | panne simulée de la liste des projets                                                                 |
-| `500` | erreur serveur inattendue                                                                             |
+| Code  | Situation                                                                                                    |
+| ----- | ------------------------------------------------------------------------------------------------------------ |
+| `400` | JSON invalide, objet, titre, description, statut, priorité, responsable, date, tags, checklist ou mitigation |
+| `413` | corps JSON supérieur à 100 kB                                                                                |
+| `404` | projet ou tâche absent                                                                                       |
+| `404` | route `/api` inconnue                                                                                        |
+| `503` | panne simulée de la liste des projets                                                                        |
+| `500` | erreur serveur inattendue                                                                                    |
 
 ## Règles de validation
 
@@ -139,10 +140,10 @@ Réponse `204` sans body.
 - statut dans `todo`, `in-progress`, `done` ;
 - priorité dans `low`, `medium`, `high` ;
 - responsable existant ;
-- date `YYYY-MM-DD` valide ;
-- tags uniquement des strings, trimés, minuscules et sans doublon ;
-- checklist avec des objets `{ label, done }` ;
-- mitigation non vide si priorité haute.
+- date `YYYY-MM-DD` réellement calendaire ;
+- tableau `tags` obligatoire, composé uniquement de chaînes, trimées, minuscules et sans doublon ;
+- tableau `checklist` obligatoire, composé d’objets `{ label, done }` sans propriété arbitraire conservée ;
+- mitigation de type chaîne, non vide si la priorité résultante est haute.
 
 ## Structure du code
 

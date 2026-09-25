@@ -9,6 +9,11 @@ describe('toErrorMessage', () => {
   });
 
   it('donne une consigne dédiée lorsque le statut est zéro', () => {
+// [Angular HTTP — Erreurs] `HttpErrorResponse`
+// Contexte : fabriquer des réponses HTTP contrôlées pour exercer les règles de traduction.
+// Objectif : vérifier le traitement selon le statut, le corps et le texte renvoyés par le serveur.
+// Justification : reproduire les erreurs du client HTTP sans dépendre d’un réseau réel.
+
     const error = new HttpErrorResponse({ status: 0 });
 
     expect(toErrorMessage(error, fallback)).toContain('start:api');

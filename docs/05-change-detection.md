@@ -2,19 +2,19 @@
 
 ## Contexte Angular 22
 
-Angular 22 fonctionne sans Zone.js dans ce projet et utilise `OnPush` comme stratégie par défaut. Tous les components applicatifs déclarent néanmoins `ChangeDetectionStrategy.OnPush` de façon explicite pour rendre leur intention visible.
+Angular 22 fonctionne sans Zone.js dans ce projet et utilise `OnPush` comme stratégie par défaut. Tous les composants applicatifs déclarent néanmoins `ChangeDetectionStrategy.OnPush` de façon explicite pour rendre leur intention visible.
 
-Le laboratoire include une stratégie `ChangeDetectionStrategy.Eager`. Elle correspond au comportement historique Always Check, anciennement exposé sous le nom Default, et sert uniquement à rendre la différence observable.
+Le laboratoire intègre une stratégie `ChangeDetectionStrategy.Eager`. Elle correspond à l’ancien `Default`, celui qui vérifie chaque composant atteint par le parcours de détection de changement ; `Default` est désormais déprécié et vaut `Eager`. Cette stratégie sert uniquement à rendre la différence observable.
 
 ## Trois notions à distinguer
 
-### Référence d’un input
+### Référence d’une entrée
 
-Angular compare l’identité d’un input. Si la même référence est fournie, un child `OnPush` n’est pas invalidé par ce changement.
+Angular compare l’identité d’une entrée. Si la même référence est fournie, un composant enfant `OnPush` n’est pas invalidé par ce changement.
 
 ### Signal
 
-Un Signal possède une égalité de valeur. Le remplacer par un nouvel objet notifie ses lecteurs. Une mutation sur place ne produit pas une nouvelle identité au niveau du Signal.
+Par défaut, un Signal compare la nouvelle valeur à la précédente avec `Object.is`. Remplacer le Signal par un nouvel objet notifie donc ses lecteurs ; une mutation sur place ne produit pas de nouvelle identité au niveau du Signal.
 
 ### Événement utilisateur
 

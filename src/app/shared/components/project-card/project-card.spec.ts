@@ -4,6 +4,11 @@ import { TestBed } from '@angular/core/testing';
 import { ProjectCard } from './project-card';
 import { makeProject, USERS } from '../../../testing/test-data';
 
+// [Angular Common — Locale] `registerLocaleData`
+// Contexte : installer la locale française pour la date affichée par la carte.
+// Objectif : contrôler le formatage rendu par Angular.
+// Justification : éviter que le résultat dépende de la locale globale.
+
 registerLocaleData(localeFr);
 
 describe('ProjectCard', () => {

@@ -68,7 +68,7 @@ stateDiagram-v2
   empty --> loading: refresh
 ```
 
-`success` ne signifie pas « une requête est terminée » mais « une donnée exploitable est disponible ». `empty` est une réponse valide qui ne produit aucun element.
+`success` ne signifie pas « une requête est terminée » mais « une donnée exploitable est disponible ». `empty` est une réponse valide qui ne produit aucun élément.
 
 ## Recherche
 

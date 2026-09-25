@@ -3,6 +3,21 @@ import { TestBed } from '@angular/core/testing';
 import { App } from './app';
 
 describe('App', () => {
+// [Angular Test — `TestBed`] `TestBed.configureTestingModule`
+// Contexte : isoler le shell applicatif et ses dépendances de routage.
+// Objectif : construire un injecteur dédié au scénario.
+// Justification : éviter l’état global et rendre le test déterministe.
+
+// [Angular Test — `TestBed`] `compileComponents`
+// Contexte : préparer la compilation des composants déclarés dans le module de test.
+// Objectif : rendre le template disponible avant la création de la fixture.
+// Justification : éviter une initialisation incomplète des directives et pipes Angular.
+
+// [Angular Router — Routage] `provideRouter`
+// Contexte : fournir un routeur sans navigation réelle au shell testé.
+// Objectif : satisfaire l’injection du routeur tout en gardant le scénario local.
+// Justification : ne pas dépendre de l’URL ou de l’historique du navigateur.
+
   beforeEach(async () => {
     localStorage.removeItem('angular-lab.workspace-density');
     await TestBed.configureTestingModule({

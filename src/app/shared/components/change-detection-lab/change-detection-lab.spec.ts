@@ -2,6 +2,16 @@ import { TestBed } from '@angular/core/testing';
 import { ChangeDetectionLab } from './change-detection-lab';
 
 describe('ChangeDetectionLab', () => {
+// [Angular Test — `TestBed`] `TestBed.configureTestingModule`
+// Contexte : déclarer le laboratoire de détection de changements.
+// Objectif : construire un injecteur isolé pour les composants de démonstration.
+// Justification : garder les stratégies Eager et OnPush sans état partagé.
+
+// [Angular Test — `TestBed`] `compileComponents`
+// Contexte : compiler le composant et ses bindings de template.
+// Objectif : rendre la fixture interactive avant la première détection.
+// Justification : stabiliser les observations DOM.
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({ imports: [ChangeDetectionLab] }).compileComponents();
   });

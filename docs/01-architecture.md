@@ -2,7 +2,7 @@
 
 ## Vue d’ensemble
 
-L’application est une SPA standalone organized par responsabilité. Les routes chargent les features à la demande. Les services de `core` possèdent l’état et les accès HTTP. Les composants de `shared` ne connaissent pas la couche réseau.
+L’application est une SPA standalone organisée par responsabilité. Les routes chargent les features à la demande. Les services de `core` possèdent l’état et les accès HTTP. Les composants de `shared` ne connaissent pas la couche réseau.
 
 ```mermaid
 flowchart LR
@@ -70,10 +70,10 @@ Règles appliquées :
 - une feature peut composer `core` et `shared` ;
 - les API Angular ne connaissent que leur ressource ;
 - les stores orchestrent les API et l’état ;
-- les templates lisent des Signals, pas des身体 subscribe HTTP ;
+- les templates lisent des Signals, sans s’abonner directement à HTTP ;
 - les fonctions de transformation restent pures et testables.
 
-## State ownership
+## Propriété de l’état
 
 | État                          | Propriétaire                | Portée       | Raison                                                 |
 | ----------------------------- | --------------------------- | ------------ | ------------------------------------------------------ |
@@ -84,7 +84,7 @@ Règles appliquées :
 | Notifications                 | `NotificationService`       | racine       | service d’infrastructure sans état métier              |
 | Recherche et statut           | `ProjectPage`               | composant    | état local de la vue                                   |
 
-## Dependency Injection
+## Injection de dépendances
 
 - `provideHttpClient()` installe l’infrastructure HTTP.
 - `LAB_API_URL` fournit `/api` sans coder l’URL dans les clients.
